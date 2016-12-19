@@ -1,136 +1,48 @@
-<<<<<<< HEAD
 import lejos.util.Delay;
 import lejos.nxt.*;
 import lejos.robotics.navigation.DifferentialPilot;
 
-=======
-import lejos.nxt.Button;
-import lejos.nxt.LCD;
-import lejos.nxt.SensorPort;
-import lejos.nxt.Motor;
-import lejos.nxt.MotorPort;
-import lejos.util.Delay;
-import lejos.nxt.UltrasonicSensor;
-import lejos.nxt.*;
-import lejos.robotics.navigation.DifferentialPilot;
-public class finalproject {
-public static void turnLeft(){
-		Motor.C.backward();
-		Motor.A.backward();
-		try {Thread.sleep(700); } catch (Exception e) {}
-		Motor.A.stop();
-		Motor.C.stop();
-		Motor.A.rotate(340);
-	}
-	public static void turnRight(){
-		Motor.C.rotate(300);
-		Motor.C.forward();
-		Motor.A.forward();
-		try {Thread.sleep(1500); } catch (Exception e) {}
-	}
-	
-
-	public static void main(String[] args) 
-		throws Exception {
-		int backward=1;
-		DifferentialPilot pilot = new DifferentialPilot(2.25f, 5.5f, Motor.C, Motor.A, true);
-		pilot.setRotateSpeed(10);
-		
-		TouchSensor touch = new TouchSensor(SensorPort.S2);
-
-		UltrasonicSensor sonic = new UltrasonicSensor( SensorPort.S3);
-
-		int jarak = sonic.getDistance();
-		int distance_in_cm = 30;
-		int flag_turn = 0;
-		int speed = 200;
-		
-		LCD.drawString("Press Any Key",1,1);
-		
-		Button.waitForAnyPress();
-		LCD.clear(); 
-		Motor.A.setSpeed(speed);
-		Motor.C.setSpeed(speed);
-		
-		do {
-			if(sonic.getDistance() < 30 ){
-				if(touch.isPressed() == true){
-					flag_turn = 1;
-					if(flag_turn == 1){
-						Motor.A.stop();
-						Motor.C.stop();
-						turnLeft();
-						flag_turn = 0;
-					} else {
-						Motor.A.forward();
-						Motor.C.forward();
-					}
-				} else {
-					Motor.A.forward();
-					Motor.C.forward();
-				}
-				
-				
-			} else if(sonic.getDistance() > 60 ){
-				flag_turn = 1;
-				Motor.A.stop();
-				Motor.C.stop();
-				if(touch.isPressed() == true && flag_turn == 0){
-					if(flag_turn == 1){
-						turnRight();
-						flag_turn = 0;
-						Motor.A.stop();
-						Motor.C.stop();
-					} else {
-						Motor.A.forward();
-						Motor.C.forward();
-					}
-				} else if(touch.isPressed() == false){
-					if(flag_turn == 1){
-						turnRight();
-						flag_turn = 0;
-						Motor.A.stop();
-						Motor.C.stop();
-					} else {
-						Motor.A.forward();
-						Motor.C.forward();
-					}
-				} else {
-					Motor.A.forward();
-					Motor.C.forward();
-				}
-			}
-			
-			 
-		}
-		while( Button.readButtons() != Button.ID_ESCAPE );
-	}
->>>>>>> fee5082c46cc1eb10ce3972da144dfbc53a3f2cf
+ 
 
 public class Finalproject {
+	public static int status = 0;
+	
 	public static void turnLeft(){
-		Motor.C.backward();
-		Motor.A.backward();
-		try {Thread.sleep(700); } catch (Exception e) {}
+		status = 1;
+//		Motor.C.backward();
+//		Motor.A.backward();
+//		try {Thread.sleep(700); } catch (Exception e) {}
 		Motor.A.stop();
 		Motor.C.stop();
-		Motor.A.rotate(340);
+		Motor.A.rotate(380);
+		Motor.A.forward();
+		Motor.C.forward();
+		try {Thread.sleep(1000); } catch (Exception e) {}
 	}
 	
 	public static void turnRight(){
 		Motor.C.rotate(300);
 		Motor.C.forward();
 		Motor.A.forward();
-		try {Thread.sleep(1500); } catch (Exception e) {}
+		try {Thread.sleep(1000); } catch (Exception e) {}
+	}
+	
+	public static void turnAtret(){
+		Motor.A.stop();
+		Motor.C.stop();
+		Motor.A.rotate(-380);
+		Motor.A.forward();
+		Motor.C.forward();
+		try {Thread.sleep(2500); } catch (Exception e) {}
 	}
 	
 	public static void main(String[] args) 
 			throws Exception {
 		
 		// inisiasi sensor
-		UltrasonicSensor sonicdepan = new UltrasonicSensor( SensorPort.S2);
-		LightSensor light = new LightSensor(SensorPort.S3);
-		UltrasonicSensor sonicsamping = new UltrasonicSensor( SensorPort.S4);
+		UltrasonicSensor sonicdepan = new UltrasonicSensor( SensorPort.S3);
+		LightSensor light = new LightSensor(SensorPort.S4);
+		UltrasonicSensor sonicsamping = new UltrasonicSensor( SensorPort.S1);
 		
 		int speed = 200;
 		
@@ -141,17 +53,38 @@ public class Finalproject {
 		Motor.A.setSpeed(speed);
 		Motor.C.setSpeed(speed);
 		
+		LCD.drawInt(light.readValue(), 3, 9, 0);
+		
 		do {
 			if(sonicsamping.getDistance() < 30){
-				if(sonicdepan.getDistance() < 30){
-					//Motor.A.rotate(-300) && Motor.C.rotate(-300);
-					Motor.A.rotate(300);
-					Motor.C.rotate(-300);
+				if(sonicdepan.getDistance() < 10 ){
+					Motor.A.stop();
+					Motor.C.stop();
+					if(status == 1){
+						Motor.A.stop();
+						Motor.C.stop();
+					} else {
+						turnRight();
+					}
 				} else {
-					Motor.A.forward();
-					Motor.C.forward();
+					if(light.readValue() < 30 ){
+						status = 0;
+						Motor.A.stop();
+						Motor.C.stop();
+						Motor.C.backward();
+						Motor.A.backward();
+						try {Thread.sleep(1900); } catch (Exception e) {}
+						Motor.A.stop();
+						Motor.C.stop();
+						turnAtret();
+					} else {
+						Motor.A.forward();
+						Motor.C.forward();
+					}
 				}
-			}
+			} else {
+				turnLeft();	
+			} 
 		}while( Button.readButtons() != Button.ID_ESCAPE );
 		
 	}
