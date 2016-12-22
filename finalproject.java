@@ -21,7 +21,7 @@ public class Finalproject {
 	}
 	
 	public static void turnRight(){
-		Motor.C.rotate(300);
+		Motor.C.rotate(360);
 		Motor.C.forward();
 		Motor.A.forward();
 		try {Thread.sleep(1000); } catch (Exception e) {}
@@ -57,14 +57,28 @@ public class Finalproject {
 		
 		do {
 			if(sonicsamping.getDistance() < 30){
-				if(sonicdepan.getDistance() < 10 ){
+				if(sonicdepan.getDistance() < 15 ){
 					Motor.A.stop();
 					Motor.C.stop();
 					if(status == 1){
 						Motor.A.stop();
 						Motor.C.stop();
 					} else {
-						turnRight();
+						if(light.readValue() < 45 && light.readValue() > 40){
+							Motor.A.stop();
+							Motor.C.stop();
+						} else if(light.readValue() < 30){
+							Motor.A.stop();
+							Motor.C.stop();
+							Motor.C.backward();
+							Motor.A.backward();
+							try {Thread.sleep(1700); } catch (Exception e) {}
+							Motor.A.stop();
+							Motor.C.stop();
+							turnRight();
+						} else {
+							turnRight();
+						}
 					}
 				} else {
 					if(light.readValue() < 30 ){
@@ -73,10 +87,10 @@ public class Finalproject {
 						Motor.C.stop();
 						Motor.C.backward();
 						Motor.A.backward();
-						try {Thread.sleep(1900); } catch (Exception e) {}
+						try {Thread.sleep(1700); } catch (Exception e) {}
 						Motor.A.stop();
 						Motor.C.stop();
-						turnAtret();
+						turnRight();
 					} else {
 						Motor.A.forward();
 						Motor.C.forward();
